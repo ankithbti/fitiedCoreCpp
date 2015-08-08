@@ -15,6 +15,7 @@ CXXFLAGS=-g -O2 -Wall $(INCS)
 SRCS = \
        ConsoleLogger.cpp \
        Log.cpp \
+       SimpleFileLogger.cpp \
 
 MAIN_SRC = Main.cpp
 
@@ -37,7 +38,7 @@ $(BINARY): $(OBJS) $(MAIN_OBJ)
 	$(CXX) -o $(BINARY) $(OBJS) $(MAIN_OBJ) $(LIBS)
 
 $(SHARED_LIB): $(OBJS)
-	$(CXX) -shared $^ -o $@
+	$(CXX) -shared $^ -o $@ $(LIBS)
 
 createlib: $(SHARED_LIB)
 	
@@ -50,4 +51,4 @@ run:
 	@echo "----------------------------"
 
 clean:
-	rm -rf $(BINARY) $(SHARED_LIB) *.o
+	rm -rf $(BINARY) $(SHARED_LIB) *.o *.log
