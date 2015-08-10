@@ -1,10 +1,9 @@
-#include <Value.hpp>
+#include <AppSetting.hpp>
 
 namespace fitiedCoreCpp
 {
 namespace appSetting
 {
-    
-}
 
+}
 }
