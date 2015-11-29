@@ -16,28 +16,29 @@
 #include <vector>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <iostream>
 
 namespace genericTransport
 {
 
-template < typename Message, typename SchemaAdaptor>
+template <typename SchemaAdaptor>
 class TcpConnectionManager;
 
-template< typename Message, typename SchemaAdaptor>
-class TcpClientConnection : private boost::noncopyable, public boost::enable_shared_from_this<TcpClientConnection<Message, SchemaAdaptor> >
+template<typename SchemaAdaptor>
+class TcpClientConnection : private boost::noncopyable, public boost::enable_shared_from_this<TcpClientConnection<SchemaAdaptor> >
 {
 public:
-    typedef boost::shared_ptr<TcpClientConnection<Message, SchemaAdaptor> > SmartPtr;
+    typedef boost::shared_ptr<TcpClientConnection<SchemaAdaptor> > SmartPtr;
 
 private:
 
     SocketSmartPtr _socket;
-    
-    Message _buffer;
+
+    ArrayBuffer _buffer;
     std::string _clientId;
     boost::shared_ptr<SchemaAdaptor> _schemaAdaptor;
-    
-    boost::shared_ptr<TcpConnectionManager<Message, SchemaAdaptor> > _manager;
+
+    boost::shared_ptr<TcpConnectionManager<SchemaAdaptor> > _manager;
 
     /// Perform an asynchronous read operation.
 
@@ -48,6 +49,7 @@ private:
 
     void asyncRead(boost::system::error_code ec, std::size_t bytes_transferred)
     {
+        std::cout << " Read " << bytes_transferred << " bytes sent from client" << std::endl;
         // Use Schema Adaptor to read the bytes
         //        switch(_schemaAdaptor.decode(_buffer, bytes_transferred)){
         //        case PACKET_READ_OK:
@@ -85,30 +87,45 @@ private:
 
 public:
 
-    TcpClientConnection(SocketSmartPtr socket, boost::shared_ptr<TcpConnectionManager<Message, SchemaAdaptor> > manager) :
+    TcpClientConnection(SocketSmartPtr socket, boost::shared_ptr<TcpConnectionManager<SchemaAdaptor> > manager) :
     _socket(socket),
     _manager(manager)
     {
-        _schemaAdaptor = boost::shared_ptr<SchemaAdaptor>(new SchemaAdaptor(this->shared_from_this()));
+        std::cout << " Creating SA " << std::endl;
+        _schemaAdaptor = boost::shared_ptr<SchemaAdaptor>(new SchemaAdaptor());
+        std::cout << " Created SA " << std::endl;
     }
 
     void do_write(ArrayBuffer& buffers)
     {
-//        std::vector<boost::asio::const_buffer> buffers;
-//        buffers.push_back(boost::asio::buffer("TestReply"));
-        boost::asio::async_write(*(_socket.get()), buffers, boost::bind(&TcpClientConnection<Message, SchemaAdaptor>::asyncWrite, this->shared_from_this(), _1, _2));
+        //        std::vector<boost::asio::const_buffer> buffers;
+        //        buffers.push_back(boost::asio::buffer("TestReply"));
+        boost::asio::async_write(*(_socket.get()), buffers, boost::bind(&TcpClientConnection<SchemaAdaptor>::asyncWrite, this->shared_from_this(), _1, _2));
     }
 
     void start()
     {
+        std::cout << " Starting Client Connection. " << std::endl;
         do_read();
     }
 
     void stop()
     {
         _socket->close();
+        _socket.reset();
     }
 
+    ~TcpClientConnection()
+    {
+        if (_socket)
+        {
+            if (_socket->is_open())
+            {
+                _socket->close();
+            }
+            _socket.reset();
+        }
+    }
 
 };
 

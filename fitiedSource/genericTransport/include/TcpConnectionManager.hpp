@@ -16,22 +16,22 @@
 namespace genericTransport
 {
 
-template <typename Message, typename SchemaAdaptor>
+template <typename SchemaAdaptor>
 class TcpConnectionManager
 {
-    typedef std::set<typename TcpClientConnection<Message, SchemaAdaptor>::SmartPtr > ClientConnections;
-    typedef typename std::set<typename TcpClientConnection<Message, SchemaAdaptor>::SmartPtr >::iterator ClientConnectionsIt;
+    typedef std::set<typename TcpClientConnection<SchemaAdaptor>::SmartPtr > ClientConnections;
+    typedef typename std::set<typename TcpClientConnection<SchemaAdaptor>::SmartPtr >::iterator ClientConnectionsIt;
     ClientConnections _clientConnections;
 
 public:
     
-    void start(typename TcpClientConnection<Message, SchemaAdaptor>::SmartPtr c){
+    void start(typename TcpClientConnection<SchemaAdaptor>::SmartPtr c){
         _clientConnections.insert(c);
         c->start();
         
     }
     
-    void stop(typename TcpClientConnection<Message, SchemaAdaptor>::SmartPtr c){
+    void stop(typename TcpClientConnection<SchemaAdaptor>::SmartPtr c){
         _clientConnections.erase(c);
         c->stop();
     }

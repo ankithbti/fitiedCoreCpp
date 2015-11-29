@@ -20,11 +20,11 @@
 namespace genericTransport
 {
 
-template < typename Message, typename SchemaAdaptor>
+template <typename SchemaAdaptor>
 class TcpServerTransport : private boost::noncopyable
 {
 public:
-    typedef boost::shared_ptr<TcpServerTransport<Message, SchemaAdaptor> > SmartPtr;
+    typedef boost::shared_ptr<TcpServerTransport<SchemaAdaptor> > SmartPtr;
 
 private:
     std::string _host;
@@ -35,13 +35,13 @@ private:
     boost::asio::ip::tcp::acceptor _acceptor;
     boost::shared_ptr<boost::thread> _ioServiceThread;
     boost::mutex _startStopMutex;
-    boost::shared_ptr<TcpConnectionManager<Message, SchemaAdaptor> > _manager;
+    boost::shared_ptr<TcpConnectionManager<SchemaAdaptor> > _manager;
 
     void do_accept()
     {
         if (_acceptor.is_open())
         {
-            _acceptor.async_accept(*(_socket.get()), boost::bind(&TcpServerTransport<Message, SchemaAdaptor>::asyncAccept, this, _1));
+            _acceptor.async_accept(*(_socket.get()), boost::bind(&TcpServerTransport<SchemaAdaptor>::asyncAccept, this, _1));
         }
     }
 
@@ -56,7 +56,7 @@ private:
         if (!ec)
         {
             std::cout << __FUNCTION__ << " :: Accepted client connection." << std::endl;
-            boost::shared_ptr<TcpClientConnection<Message, SchemaAdaptor> > clientConn(new TcpClientConnection<Message, SchemaAdaptor>(_socket, _manager));
+            boost::shared_ptr<TcpClientConnection<SchemaAdaptor> > clientConn(new TcpClientConnection<SchemaAdaptor>(_socket, _manager));
             _manager->start(clientConn);
             _socket = SocketSmartPtr(new boost::asio::ip::tcp::socket(_ioService));
         }
@@ -86,7 +86,7 @@ public:
     _ioWork(_ioService),
     _socket(new boost::asio::ip::tcp::socket(_ioService)),
     _acceptor(_ioService),
-    _manager(new TcpConnectionManager<Message, SchemaAdaptor>())
+    _manager(new TcpConnectionManager<SchemaAdaptor>())
     {
 
         boost::asio::ip::tcp::resolver resolver(_ioService);
@@ -120,7 +120,7 @@ public:
         std::cout << __FUNCTION__ << " :: Starting TCP Server." << std::endl;
         if (!_ioServiceThread)
         {
-            _ioServiceThread = boost::shared_ptr<boost::thread>(new boost::thread(&TcpServerTransport<Message, SchemaAdaptor>::runIoService, this));
+            _ioServiceThread = boost::shared_ptr<boost::thread>(new boost::thread(&TcpServerTransport<SchemaAdaptor>::runIoService, this));
         }
         do_accept();
         std::cout << __FUNCTION__ << " :: Started TCP Server." << std::endl;
