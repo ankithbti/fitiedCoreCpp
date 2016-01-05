@@ -20,6 +20,8 @@
 namespace genericTransport
 {
 
+
+// To DO - Remove template here....Only Channel will have SA
 template <typename SchemaAdaptor>
 class TcpServerTransport : private boost::noncopyable
 {
@@ -139,6 +141,10 @@ public:
         _manager->stopAll();
         std::cout << __FUNCTION__ << " :: Stopped TCP Server." << std::endl;
 
+    }
+    
+    void send(const ArrayBuffer& buffer, int clientId){
+        // _manager get the appropriate Client Connection and sends data to it
     }
 
 

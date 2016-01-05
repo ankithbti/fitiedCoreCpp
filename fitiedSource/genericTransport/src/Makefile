@@ -7,7 +7,8 @@ SHARED_LIB=../lib/libgenericTransport.so
 BOOST_BASE=${BOOST_INSTALL_ROOT}
 TINYXML_BASE=${TINYXML_ROOT}
 APP_LOGGER_BASE=${APP_LOGGER_ROOT}
-
+APP_SETTING_BASE=${APP_SETTING_ROOT}
+COOL_TYPES_BASE=/Users/ankithbti/Development/
 
 ARCH = $(shell uname -m)	# ARCH becomes the output from the uname -m command.
 CXX=/usr/bin/g++
@@ -17,6 +18,10 @@ SRCS = \
 	TcpServerTransport.cpp \
 	TcpClientConnection.cpp \
 	TcpConnectionManager.cpp \
+	Message.cpp \
+	Channel.cpp \
+	MessageVisitor.cpp \
+	PBSchemaAdaptor.cpp \
 	
 MAIN_SRC = Main.cpp
 
@@ -27,9 +32,11 @@ INCS = -I../include \
        -I$(BOOST_BASE)/include \
        -I$(TINYXML_BASE)/include \
        -I$(APP_LOGGER_BASE)/include \
+       -I$(APP_SETTING_BASE)/include \
 
 LIBS = \
 	-L$(APP_LOGGER_BASE)/lib -lappLogger \
+	-L$(APP_SETTING_BASE)/lib -lappSetting \
         -L$(TINYXML_BASE)/lib -ltinyXml \
         -L$(BOOST_BASE)/lib -lboost_thread \
         -L$(BOOST_BASE)/lib -lboost_system \

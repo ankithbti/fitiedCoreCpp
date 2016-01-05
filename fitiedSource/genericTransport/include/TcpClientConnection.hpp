@@ -49,11 +49,18 @@ private:
 
     void asyncRead(boost::system::error_code ec, std::size_t bytes_transferred)
     {
-        std::cout << " Read " << bytes_transferred << " bytes sent from client" << std::endl;
-        // Use Schema Adaptor to read the bytes
-        //        switch(_schemaAdaptor.decode(_buffer, bytes_transferred)){
+        std::cout << " Read " << bytes_transferred << " bytes sent from client - " << _buffer.data() << std::endl;
+        
+        // Call Channel's Callback of Reading these bytes
+        // channelCallback(clientId, _buffer.data(), countOfBytes);
+        // Channel has SchemaAdaptor which should know how to interpret these bytes
+        // Return of this callback should be a STATUS type
+        // PACKET_READ_OK
+        // PACKET_READ_INCOMPLETE
+        // PACKET_READ_ERROR
+        
+        //        switch(channelCallback(clientId, _buffer, bytes_transferred)){
         //        case PACKET_READ_OK:
-        //        SA will only send whatever it wants
         //            break;
         //        case PACKET_READ_INCOMPLETE:
         //          do_read();
